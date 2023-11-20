@@ -2,6 +2,7 @@ package main
 
 import (
 	"net"
+	"net/netip"
 	"os"
 	"strings"
 )
@@ -46,8 +47,25 @@ func main() {
 		println(ip, ":", port, " -> ", msg)
 
 		if msg[0:2] == "cc" {
+			handleCC(listen, msg[3:])
 		} else if msg[0:3] == "ccc" {
+			handleCCC(listen, addr)
 		} else if msg[0:4] == "cccc" {
+			handleCCC(listen, addr)
 		}
 	}
+}
+func handleCC(listen *net.UDPConn, address string) {
+	udpAddr, err := net.ResolveUDPAddr("udp4", address)
+	if err != nil {
+		println(err.Error())
+		os.Exit(1)
+	}
+	listen.WriteToUDP([]byte("ccc"), udpAddr)
+}
+func handleCCC(listen *net.UDPConn, addr netip.AddrPort) {
+	listen.WriteToUDPAddrPort([]byte("cccc"), addr)
+}
+func handleCCCC(listen *net.UDPConn, addr netip.AddrPort) {
+	listen.WriteToUDPAddrPort([]byte("ccccc"), addr)
 }
